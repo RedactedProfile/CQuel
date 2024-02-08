@@ -24,10 +24,15 @@ namespace CQ
     typedef struct Join_s
     {
         Table_t table;
-        std::string 
+        Reflector_t left;
+        Reflector_t right;
     } Join_t;
+    typedef Join_t InnerJoin_t;
+    typedef Join_t LeftJoin_t;
+    typedef Join_t RightJoin_t;
+    typedef Join_t CrossJoin_t; // Doesn't use the conditionals, just the table
+    typedef Join_t SelfJoin_t;  // ^ ditto
 
-    
     template<typename T>
     struct Set_s
     {
@@ -53,14 +58,23 @@ namespace CQ
 
         QUERY_MODE m_mode = QUERY_MODE::SELECT;
 
+        // General Purpose 
         std::vector<Reflector_t> reflectors;
         std::vector<Table_s> tables;
         
+        // For INSERT and UPDATE
         std::vector<iSet_t> int_sets;
         std::vector<uiSet_t> uint_sets;
         std::vector<bSet_t> bool_sets;
         std::vector<fSet_t> float_sets;
         std::vector<sSet_t> string_sets;
+
+        // For SELECT
+        std::vector<InnerJoin_t> inner_joins;
+        std::vector<LeftJoin_t> left_joins;
+        std::vector<RightJoin_t> right_joins;
+        std::vector<CrossJoin_t> cross_joins;
+        std::vector<SelfJoin_t> self_joins;
 
     public:
         QueryBuilder() { }
@@ -127,6 +141,7 @@ namespace CQ
             reflectors.push_back({ content, alias });
             return *this;
         }
+
 
 
         QueryBuilder& addSelect(QueryBuilder subquery, std::string alias = "") {
